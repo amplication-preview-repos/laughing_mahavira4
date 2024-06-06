@@ -1,0 +1,114 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Task {
+  comments    Comment[]
+  createdAt   DateTime          @default(now())
+  description String?
+  dueDate     DateTime?
+  files       File[]
+  id          String            @id @default(cuid())
+  priority    EnumTaskPriority?
+  project     Project?          @relation(fields: [projectId], references: [id])
+  projectId   String?
+  status      EnumTaskStatus?
+  title       String?
+  updatedAt   DateTime          @updatedAt
+}
+
+model Project {
+  createdAt   DateTime  @default(now())
+  description String?
+  endDate     DateTime?
+  id          String    @id @default(cuid())
+  name        String?
+  startDate   DateTime?
+  tasks       Task[]
+  updatedAt   DateTime  @updatedAt
+}
+
+model File {
+  createdAt  DateTime @default(now())
+  fileName   String?
+  fileUrl    String?
+  id         String   @id @default(cuid())
+  task       Task?    @relation(fields: [taskId], references: [id])
+  taskId     String?
+  updatedAt  DateTime @updatedAt
+  uploadedBy String?
+}
+
+model Message {
+  chatRoom   ChatRoom? @relation(fields: [chatRoomId], references: [id])
+  chatRoomId String?
+  content    String?
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(cuid())
+  sender     String?
+  sentAt     DateTime?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Comment {
+  createdAt DateTime @default(now())
+  createdBy String?
+  id        String   @id @default(cuid())
+  task      Task?    @relation(fields: [taskId], references: [id])
+  taskId    String?
+  text      String?
+  updatedAt DateTime @updatedAt
+}
+
+model ChatRoom {
+  createdAt DateTime  @default(now())
+  id        String    @id @default(cuid())
+  messages  Message[]
+  name      String?
+  updatedAt DateTime  @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+model Ticket {
+  assignee    String?
+  createdAt   DateTime            @default(now())
+  description String?
+  id          String              @id @default(cuid())
+  priority    EnumTicketPriority?
+  reporter    String?
+  status      EnumTicketStatus?
+  title       String?
+  updatedAt   DateTime            @updatedAt
+}
+
+enum EnumTaskPriority {
+  Option1
+}
+
+enum EnumTaskStatus {
+  Option1
+}
+
+enum EnumTicketPriority {
+  Option1
+}
+
+enum EnumTicketStatus {
+  Option1
+}
